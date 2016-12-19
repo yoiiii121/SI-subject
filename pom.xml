@@ -5,7 +5,7 @@
   <groupId>si</groupId>
   <artifactId>si</artifactId>
   <version>0.0.0</version>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
 
   <name>SI</name>
   <url>http://maven.apache.org</url>

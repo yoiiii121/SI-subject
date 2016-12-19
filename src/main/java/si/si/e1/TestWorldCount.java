@@ -15,7 +15,6 @@ public final class TestWorldCount {
 	private static final Pattern SPACE = Pattern.compile(" ");
 
 	public static void main(final String[] args) throws Exception {
-
 		// 1. Definir un SparkContext final
 		SparkConf sConfig = new SparkConf().setAppName(NAME).setMaster("local[2]");
 		JavaSparkContext ctx = new JavaSparkContext(sConfig);
