@@ -17,7 +17,10 @@ import twitter4j.Status;
 import twitter4j.auth.Authorization;
 
 public final class TestManagementTwitter {
-	private static final String PATH = "/home/nu14/Escritorio/Twitts";
+	
+	private static final String PATHLinux = "/home/nu14/Escritorio/Twitts";
+	private static final String PATHWindows = "C:\\Users\\Nacho\\Desktop\\Twitts";
+
 	public static void main(String[] args) throws Exception {
 		// 1. Definir el objeto configurador de Spark
 		String master = System.getProperty("spark.master");
@@ -28,14 +31,18 @@ public final class TestManagementTwitter {
 		StreamerHelper.configureTwitterCredentials();
 		Authorization twitter = StreamerHelper.getAuthority();
 		String[] filters = StreamerHelper.getKeys();
-		JavaStreamingContext ssc = new JavaStreamingContext(ctx, new Duration(10000));
+		JavaStreamingContext ssc = new JavaStreamingContext(ctx, new Duration(100000));
 		JavaReceiverInputDStream<Status> stream = TwitterUtils.createStream(ssc, twitter, filters);
 		JavaDStream<String> filtered = stream.map(status -> "" + status.getText());
+		String sSistemaOperativo = System.getProperty("os.name");
 		filtered.foreachRDD(rdd -> {
 			LocalDateTime lc = LocalDateTime.now();
 			System.out.println(rdd.collect());
-			rdd.saveAsTextFile(PATH + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
-
+			if (sSistemaOperativo.contains("Windows")) {
+				rdd.saveAsTextFile(PATHWindows + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
+			}else{
+				rdd.saveAsTextFile(PATHLinux + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
+			}
 		});
 		// 3. Abrir canal de datos
 		ssc.start();
