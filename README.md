@@ -1,4 +1,4 @@
-# SI-subject
+# **SI-subject**
 ##This projects contain some exercises:
 ### e1 = Unsorted words Count
 ### e2 = Extraction of one CSV column

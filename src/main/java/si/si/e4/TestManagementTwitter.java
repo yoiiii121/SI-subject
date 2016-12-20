@@ -20,7 +20,6 @@ public final class TestManagementTwitter {
 	
 	private static final String PATHLinux = "/home/nu14/Escritorio/Twitts";
 	private static final String PATHWindows = "C:\\Users\\Nacho\\Desktop\\Twitts";
-
 	public static void main(String[] args) throws Exception {
 		// 1. Definir el objeto configurador de Spark
 		String master = System.getProperty("spark.master");
@@ -38,11 +37,15 @@ public final class TestManagementTwitter {
 		filtered.foreachRDD(rdd -> {
 			LocalDateTime lc = LocalDateTime.now();
 			System.out.println(rdd.collect());
+			
 			if (sSistemaOperativo.contains("Windows")) {
-				rdd.saveAsTextFile(PATHWindows + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
+			
+			 rdd.saveAsTextFile(PATHWindows + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
+
 			}else{
 				rdd.saveAsTextFile(PATHLinux + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
 			}
+
 		});
 		// 3. Abrir canal de datos
 		ssc.start();
