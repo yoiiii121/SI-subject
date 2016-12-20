@@ -4,4 +4,5 @@
 ### e2 = Extraction of one CSV column
 ### e3 = Join of two JSON related tables
 ### e4 = Twitts extraction of Twitter  
- 
+
+*Import to existing Maven projects*
