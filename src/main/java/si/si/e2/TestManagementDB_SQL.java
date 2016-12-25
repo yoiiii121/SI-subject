@@ -19,7 +19,7 @@ public final class TestManagementDB_SQL {
 		SQLContext sql = SQLContext.getOrCreate(ctx.sc());
 		// 2. Resolver nuestro problema
 		Dataset<Row> dataset = sql.read().option("header", true).option("inferSchema", true)
-				.csv("./src/main/java/si/si/e2/a.csv");
+				.csv(args[0]+"a.csv");
 		Dataset<Row> manufacturas = dataset.select(dataset.col("Manufacturer")).distinct();
 
 		dataset.printSchema();

@@ -10,7 +10,6 @@ import si.si.SparkConfigs;
 
 public final class TestManagementDB_Join_JSON {
 	private static final String NAME = "TestWordCount";
-	private static String[] paths = { "./src/main/java/si/si/e3/a.json", "./src/main/java/si/si/e3/b.json"};
 
 	public static void main(String[] args) {
 		String master = System.getProperty("spark master");
@@ -19,8 +18,8 @@ public final class TestManagementDB_Join_JSON {
 		JavaSparkContext ctx = new JavaSparkContext(sc);
 		SQLContext sql = SQLContext.getOrCreate(ctx.sc());
 
-		Dataset<Row> dataset = sql.read().option("inferShchema", true).json(paths[0]);
-		Dataset<Row> dataset2 = sql.read().option("inferShchema", true).json(paths[1]);
+		Dataset<Row> dataset = sql.read().option("inferShchema", true).json(args[0]+"a.json");
+		Dataset<Row> dataset2 = sql.read().option("inferShchema", true).json(args[0]+"b.json");
 
 		Dataset<Row> join = dataset.join(dataset2);
 

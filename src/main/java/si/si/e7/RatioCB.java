@@ -1,23 +1,23 @@
 package si.si.e7;
 
 import org.apache.spark.sql.Row;
+import scala.Tuple2;
 
 public class RatioCB {
 	private Integer idItem1;
 	private Integer idItemTentation;
 	private Integer similarity;
-	
-	
-	public RatioCB(){};
-	
-	
-	public RatioCB(Row _x, Integer similarity) {
 
-		this.idItem1 = _x.getInt(0);
-		this.idItemTentation = _x.getInt(0);
-		this.similarity = similarity;
+	public RatioCB() {
+	};
+
+	public RatioCB(Tuple2<Row, Integer> _x) {
+
+		this.idItem1 = _x._1().getInt(0);
+		this.idItemTentation = _x._1().getInt(0);
+		this.similarity = _x._2();
 	}
-	
+
 	public RatioCB(Integer idItem1, Integer idIntemTentation, Integer similarity) {
 
 		this.idItem1 = idItem1;
@@ -29,31 +29,25 @@ public class RatioCB {
 		return idItem1;
 	}
 
-
 	public void setIdItem1(Integer idItem1) {
 		this.idItem1 = idItem1;
 	}
-
 
 	public Integer getIdItemTentation() {
 		return idItemTentation;
 	}
 
-
 	public void setIdItemTentation(Integer idItemTentation) {
 		this.idItemTentation = idItemTentation;
 	}
-
 
 	public Integer getSimilarity() {
 		return similarity;
 	}
 
-
 	public void setSimilarity(Integer similarity) {
 		this.similarity = similarity;
 	}
-
 
 	@Override
 	public int hashCode() {
@@ -64,7 +58,6 @@ public class RatioCB {
 		result = prime * result + ((similarity == null) ? 0 : similarity.hashCode());
 		return result;
 	}
-
 
 	@Override
 	public boolean equals(Object obj) {
@@ -93,12 +86,10 @@ public class RatioCB {
 		return true;
 	}
 
-
 	@Override
 	public String toString() {
 		return "RatioCB [idItem1=" + idItem1 + ", idItemTentation=" + idItemTentation + ", similarity=" + similarity
 				+ "]";
 	}
 
-	
 }
