@@ -1,7 +1,10 @@
 package si.si.e9;
 
 
+
 import java.util.Arrays;
+
+import scala.Tuple2;
 import java.util.Properties;
 
 import org.apache.spark.api.java.JavaRDD;
@@ -13,7 +16,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 
-import scala.Tuple2;
 import si.si.SparkConfigs;
 
 public class TestFPGrouwth2 {
@@ -23,12 +25,12 @@ public class TestFPGrouwth2 {
 	private static final Double MIN_CONFIDENCE = 0.95;
 	private static final String NAME = "TestFPGrouwth2";
 	private static final String URL = "jdbc:mysql://localhost:3306/films";
-	private static final String TABLE = "ratingusersitems";
+	private static final String TABLE = "ratingsgrowth";
 
 	public static void main(String[] args) throws Exception {
 
 		String master = System.getProperty("spark.master");
-		JavaSparkContext ctx = new JavaSparkContext(SparkConfigs.create(NAME, master == null ? "local[2]" : master)
+		JavaSparkContext ctx = new JavaSparkContext(SparkConfigs.create(NAME, master == null ? "local[3]" : master)
 				.set("spark.sql.crossJoin.enabled", "true"));
 
 		SQLContext sql = SQLContext.getOrCreate(ctx.sc());
@@ -43,23 +45,29 @@ public class TestFPGrouwth2 {
 		properties.setProperty("useLegacyDatetimeCode", "false");
 		properties.setProperty("serverTimezone", "UTC");
 		Dataset<Row> completa = sql.read().jdbc(URL, TABLE, properties);
+
 		JavaRDD<Iterable<String>> aux = completa.javaRDD()
-				.mapToPair(
-						x -> new Tuple2 <String, String>(""+ x.get(0),"" + x.getInt(1)))
-						.reduceByKey((z,y)-> (String) (z + " " + y))
-						.map(x -> Arrays.asList(x._2.split(" ")));
-		
-		
+				.mapToPair(x -> new Tuple2<String, String>("" + x.getInt(0), "" + x.getInt(1)))
+				.reduceByKey((z, y) -> (String) (z + " " + y))
+				.map(x -> Arrays.asList(x._2.split(" ")));
+
 		FPGrowth fp = new FPGrowth().setMinSupport(MIN_SUPPORT).setNumPartitions(NUM_PARTITIONS);
 		FPGrowthModel<String> model = fp.run(aux);
-
+		for (FPGrowth.FreqItemset<String> itemset : model.freqItemsets().toJavaRDD().collect()) {
+					System.out.println("[" + itemset.javaItems() + "], " + itemset.freq());
+			}
 		AssociationRules arules = new AssociationRules().setMinConfidence(MIN_CONFIDENCE);
 		JavaRDD<AssociationRules.Rule<String>> results = arules
-				.run(new JavaRDD<>(model.freqItemsets(), model.freqItemsets().org$apache$spark$rdd$RDD$$evidence$1));
+				.run(new JavaRDD<>(
+						model.freqItemsets(), 
+						model.freqItemsets().org$apache$spark$rdd$RDD$$evidence$1));
+
 		for (AssociationRules.Rule<String> rule : results.collect()) {
 			System.out.println(rule.javaAntecedent() + " => " + rule.javaConsequent() + ", " + rule.confidence());
-
 		}
+
+
+		
 		ctx.stop();
 		ctx.close();
 

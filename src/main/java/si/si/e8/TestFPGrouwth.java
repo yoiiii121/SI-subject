@@ -16,11 +16,11 @@ import si.si.SparkConfigs;
 
 public class TestFPGrouwth {
 
-	private static final Double MIN_SUPPORT = 0.0;
+	private static final Double MIN_SUPPORT = 0.3;
 	private static final Integer NUM_PARTITIONS = 1000;
 	private static final String NAME = "TestFPGrouwth";
 	private static final String URL = "jdbc:mysql://localhost:3306/films";
-	private static final String TABLE = "users";
+	private static final String TABLE = "ratingsgrowth";
 
 	public static void main(String[] args) throws Exception {
 
@@ -40,10 +40,12 @@ public class TestFPGrouwth {
 		properties.setProperty("useLegacyDatetimeCode", "false");
 		properties.setProperty("serverTimezone", "UTC");
 		Dataset<Row> completa = sql.read().jdbc(URL, TABLE, properties);
-
+		
+		
 		JavaRDD<Iterable<String>> aux = completa.javaRDD()
-				.mapToPair(x -> new Tuple2<String, String>("" + x.get(0), "" + x.getInt(1)))
-				.reduceByKey((z, y) -> (String) (z + " " + y)).map(x -> Arrays.asList(x._2.split(" ")));
+				.mapToPair(x -> new Tuple2<String, String>("" + x.getInt(0), "" + x.getInt(1)))
+				.reduceByKey((z, y) -> (String) (z + " " + y))
+				.map(x -> Arrays.asList(x._2.split(" ")));
 		FPGrowth fp = new FPGrowth().setMinSupport(MIN_SUPPORT).setNumPartitions(NUM_PARTITIONS);
 		FPGrowthModel<String> model = fp.run(aux);
 		for (

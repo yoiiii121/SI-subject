@@ -5,11 +5,13 @@ import si.si.e10.TestKmeans;
 import si.si.e2.TestManagementDB_SQL;
 import si.si.e3.TestManagementDB_Join_JSON;
 import si.si.e4.TestManagementTwitter;
+import si.si.e6.TestSparkSQLMLlibRSALS;
 import si.si.e7.TestSparkSQLMLlibRSContentBased;
 import si.si.e8.TestFPGrouwth;
 import si.si.e9.TestFPGrouwth2;
 
 public final class Run_Main {
+	private static final int nexercises = 10;
 
 	public static void main(String[] args) throws Exception {
 
@@ -25,13 +27,19 @@ public final class Run_Main {
 
 		}
 		System.out.println("Program is starting");
-		int nexercises = 8;
 		int opt;
 		String entradaTeclado = "";
 		Scanner entradaEscaner = new Scanner(System.in);
 		do {
 			System.out.println("Please: input a number from 1 to " + nexercises);
-
+			System.out.println("Options:" + " \n1 = Unsorted words Count" + " \n2 = Extraction of one CSV column"
+					+ " \n3 = Join of two JSON related tables" + " \n4 = Twitts extraction of Twitter"
+					+ " \n5 = Twitts sentiment extraction of Twitter"
+					+ " \n6 = Recomendation system hibrid using ALS algorithm"
+					+ " \n7 = Recomendation system hibrid adding a similarity decimal number"
+					+ " \n8 = Find Frequent Item Sets with the FP-growth Algorithm"
+					+ " \n9 = Assign association rules of frequent Item Sets with the FP-growth Algorithm"
+					+ " \n10 = Compute Clastering with Kmeans algorithm" + "\n");
 			entradaTeclado = entradaEscaner.nextLine();
 
 			try {
@@ -58,24 +66,29 @@ public final class Run_Main {
 				break;
 			case 4:
 				System.out.println("if the execution have failed, you should change the value computerUser");
-				path[0] = "/home/" + computerUser + "/Escritorio/";
-				path[1] = "C:\\Users\\" + computerUser + "\\Desktop\\";
+				path[0] = "/home/" + computerUser + "/Escritorio/Twitts/";
+				path[1] = "C:\\Users\\" + computerUser + "\\Desktop\\Twitts\\";
 				TestManagementTwitter.main(path);
 				break;
 			case 5:
 				System.out.println("if the execution have failed, you should change the value computerUser");
-				path[0] = "/home/" + computerUser + "/Escritorio/";
-				path[1] = "C:\\Users\\" + computerUser + "\\Desktop\\";
-				TestSparkSQLMLlibRSContentBased.main(path);
+				path[0] = "/home/" + computerUser + "/Escritorio/Twitts/";
+				path[1] = "C:\\Users\\" + computerUser + "\\Desktop\\Twitts\\";
+				TestManagementTwitter.main(path);
 				break;
 			case 6:
-				TestFPGrouwth.main(path);
+				TestSparkSQLMLlibRSContentBased.main(path);
 				break;
 			case 7:
-				TestFPGrouwth2.main(path);
+				TestSparkSQLMLlibRSALS.main(path);
 				break;
 			case 8:
-				
+				TestFPGrouwth.main(path);
+				break;
+			case 9:
+				TestFPGrouwth2.main(path);
+				break;
+			case 10:
 				TestKmeans.main(path);
 				break;
 			default:

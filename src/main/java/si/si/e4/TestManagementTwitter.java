@@ -37,12 +37,12 @@ public final class TestManagementTwitter {
 			String sSistemaOperativo = System.getProperty("os.name");
 
 			if (sSistemaOperativo.contains("Windows")) {
-				
+
 				rdd.saveAsTextFile(args[1] + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
 
-				}else{
-					rdd.saveAsTextFile(args[0] + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
-				}
+			} else {
+				rdd.saveAsTextFile(args[0] + Path.SEPARATOR + lc.toEpochSecond(ZoneOffset.UTC));
+			}
 		});
 		// 3. Abrir canal de datos
 		ssc.start();

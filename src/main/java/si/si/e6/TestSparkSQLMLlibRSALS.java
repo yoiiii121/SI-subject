@@ -1,24 +1,26 @@
-package si.si.e7;
+package si.si.e6;
+
 
 import java.util.Properties;
 
-import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.ml.recommendation.ALS;
+import org.apache.spark.ml.recommendation.ALSModel;
 import org.apache.spark.sql.AnalysisException;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
-import scala.Tuple2;
+
 import si.si.SparkConfigs;
 
-public final class TestSparkSQLMLlibRSContentBased {
-	private static final String NAME = "TestSparkSQLMLlibRSContentBased";
+public final class TestSparkSQLMLlibRSALS {
+	private static final String NAME = "TestSparkSQLMLlibRSALS";
 	private static final String URL = "jdbc:mysql://localhost:3306/films";
-	private static final String TABLE = "ratingusersitems";
+	private static final String TABLE = "items";
 
 	public static void main(String[] args) throws AnalysisException {
 		String master = System.getProperty("spark.master");
-		JavaSparkContext ctx = new JavaSparkContext(SparkConfigs.create(NAME, master == null ? "local[2]" : master)
+		JavaSparkContext ctx = new JavaSparkContext(SparkConfigs.create(NAME, master == null ? "local[3]" : master)
 				.set("spark.sql.crossJoin.enabled", "true"));
 
 		SQLContext sql = SQLContext.getOrCreate(ctx.sc());
@@ -34,16 +36,15 @@ public final class TestSparkSQLMLlibRSContentBased {
 		properties.setProperty("serverTimezone", "UTC");
 
 		Dataset<Row> dataset = sql.read().jdbc(URL, TABLE, properties);
-
-		JavaRDD<RatioCB> rdd = dataset.select(dataset.col("idUser").as("user1"), dataset.col("idMovie").as("film1"))
-				.join(dataset.select(dataset.col("idUser").as("user2"), dataset.col("idMovie").as("film2")))
-				.where("user1 = user2").where("film1 <> film2").select("film1", "film2").javaRDD()
-				.mapToPair(x -> new Tuple2<Row, Integer>(x, 1)).reduceByKey((x, y) -> x + y).map(x -> new RatioCB(x));
-
-		sql.createDataFrame(rdd, RatioCB.class).write().jdbc(URL, TABLE + "CB", properties);
-		
-		
+		ALS als = new ALS().setMaxIter(5).setRegParam(0.01).setUserCol("idUser").setItemCol("idMovie")
+				.setRatingCol("rating");
+		ALSModel model = als.fit(dataset);
+		Dataset<Row> completa = dataset.select(dataset.col("idUser")).distinct()
+				.join(dataset.select(dataset.col("idMovie")).distinct());
+		completa = model.transform(completa);
+		completa.write().jdbc(URL, TABLE + "ALS", properties);
 		ctx.stop();
 		ctx.close();
+
 	}
 }

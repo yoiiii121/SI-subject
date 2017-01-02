@@ -1,5 +1,6 @@
 package si.si.e10;
 
+import java.util.Arrays;
 import java.util.Properties;
 
 import org.apache.spark.api.java.JavaRDD;
@@ -13,7 +14,6 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SQLContext;
 
-
 import si.si.SparkConfigs;
 
 public class TestKmeans {
@@ -21,9 +21,8 @@ public class TestKmeans {
 	private static final String URL = "jdbc:mysql://localhost:3306/films";
 	private static final String TABLE = "users";// USERS
 	private static final Integer MAX_ITER = 10;
-	private static final Integer SEED = 100;
+	private static final Integer SEED = 55;
 	private static final Integer K = 5;
-	
 
 	public static void main(String[] args) {
 		String master = System.getProperty("spark.master");
@@ -43,18 +42,14 @@ public class TestKmeans {
 		properties.setProperty("serverTimezone", "UTC");
 
 		Dataset<Row> users = sql.read().jdbc(URL, TABLE, properties);
-		
-		JavaRDD<Vector> jrdd = new JavaRDD<Row>(users.rdd(),
-				users.org$apache$spark$sql$Dataset$$classTag()).
-				map(x -> Vectors.dense(new double[] { x.getInt(0) }));
-		// Cluster the data into two classes using KMeans
+
+		JavaRDD<Vector> jrdd = new JavaRDD<Row>(users.rdd(), users.org$apache$spark$sql$Dataset$$classTag())
+				.map(x -> Vectors.dense(new double[] { x.getInt(0) }));
+
 		KMeansModel clusters = new KMeans().setSeed(SEED).setK(K).setMaxIterations(MAX_ITER).run(jrdd.rdd());
-	System.out.println(clusters.clusterCenters()[0]);
-	System.out.println(clusters.clusterCenters()[1]);
-		
+		System.out.println(Arrays.toString(clusters.clusterCenters()));
 		ctx.stop();
 		ctx.close();
 	}
-	
 
 }
